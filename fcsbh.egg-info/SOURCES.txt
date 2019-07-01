@@ -1,0 +1,8 @@
+setup.py
+fcsbh.egg-info/PKG-INFO
+fcsbh.egg-info/SOURCES.txt
+fcsbh.egg-info/dependency_links.txt
+fcsbh.egg-info/entry_points.txt
+fcsbh.egg-info/not-zip-safe
+fcsbh.egg-info/requires.txt
+fcsbh.egg-info/top_level.txt
