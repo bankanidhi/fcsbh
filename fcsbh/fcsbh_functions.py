@@ -69,7 +69,7 @@ def return_data(filename,*args):
     return z
 
 
-def plot_raw_counts(filename):
+def plot_raw_counts1(filename):
     file_list = find_files()
     counter = 0
     for k in file_list:
@@ -80,11 +80,61 @@ def plot_raw_counts(filename):
             break
     plt.xlabel("Time (ms)")
     plt.ylabel("Photons per ms")
-    plt.ylim(0,16000)
+    plt.ylim(-25,16000)
+    plt.show()
+
+def plot_raw_counts(filename):
+    file_list = find_files()
+    counter = 0
+    b = []
+    spikes = []
+    for k in file_list:
+        temp = return_data(k)
+        for m in temp:
+            b.append(m)
+        counter += 1
+        if counter >= 10:
+            break
+    b = np.asarray(b)
+    edge_min = b.min()
+    edge_max = b.max()
+    no_of_bins = int(edge_max-edge_min)
+    hist, bin_edges = np.histogram(b,bins=no_of_bins,range=(edge_min,edge_max))
+    
+    for sp in b:
+        if sp > 114:
+            spikes.append(sp)
+    spikes = np.asarray(spikes)
+    spike_min = spikes.min()
+    spike_max = spikes.max()
+    spike_bin = int(spike_max - spike_min)
+
+    hist1, bin_edges1 = np.histogram(spikes,bins=spike_bin,range=(spike_min,spike_max))
+    print(len(spikes))
+
+    # plt.plot(bin_edges[1:],hist)
+    plt.bar(bin_edges1[1:],hist1)
     plt.show()
 
 
+def gaus1(t, y0, a, b, w):
+    return y0 + a*np.exp(((-4*np.log(2))*(t-b)**2)/w**2)   
 
+
+def fit_model(t, y, jj, zjj, meanz, stdd):
+    gmodel = Model(gaus1)
+    gmodel.set_param_hint('a', value=zjj, min=0.8*zjj, max=1.2*zjj)
+    gmodel.set_param_hint('b', value=jj, min=jj-2, max=jj+2)
+    gmodel.set_param_hint('w', value=1.2, min=0.1, max=20)
+    gmodel.set_param_hint('y0', value=meanz, min=meanz -
+                          stdd/2, max=meanz + stdd/2)
+    pars = gmodel.make_params()
+    return gmodel.fit(y, pars, t=t)
+
+
+def find_peaks(z,cutoff):
+    indexes = peakutils.indexes(z, thres=cutoff, min_dist=20, thres_abs=True)
+    return indexes
 
 """ This function when called with an arguement return that file if present. Without ant argumrnts, it returns a list containing all .asc file
 """
