@@ -14,14 +14,8 @@ import peakutils
 
 matplotlib.style.use("seaborn-colorblind")
 
-
-# def columns(filename):
-#     b = np.genfromtxt(filename, delimiter="\t", skip_header=50, max_rows=186)
-#     return b.shape[1]
-
-
-def return_average_count(filename):
-    """This function opens ascii files and reads the average count from the file data
+def return_data(filename,*args):
+    """This function opens ascii files and processes the data to return one of the following:Average counts, correlation or raw counts, depending on the *args parameter
     """
 
     b = open(filename, 'r')
@@ -68,26 +62,31 @@ def return_average_count(filename):
     """ Statistical analysis of PCH dara from raw counts
     """
     z = raw_count[1]
-    no_of_bins = int(1.9*mean_count)
-    hist, bin_edges = np.histogram(z, bins=no_of_bins, range=(mean_count/10, 20.0*mean_count), weights=None, density=False)
-
-    meanz = np.mean(z)
-    stdd = np.std(z)
-
-    """ plotting details if required
-    """
-    plt.plot(hist)
-    # fig, ax = plt.subplots()
-    # ax.semilogx(useful_corr_x,useful_corr_y)
-    # ax.grid()
-    # plt.autoscale(enable=False, tight=None)
+    edge_min = z.min()
+    edge_max = z.max()
+    no_of_bins = int(edge_max-edge_min)
+    hist, bin_edges = np.histogram(z,bins=no_of_bins,range=(edge_min,edge_max))
+    return z
 
 
-    # just to show the plot
+def plot_raw_counts(filename):
+    file_list = find_files()
+    counter = 0
+    for k in file_list:
+        b = return_data(k)
+        counter += 1
+        plt.plot(b)
+        if counter >= 10:
+            break
+    plt.xlabel("Time (ms)")
+    plt.ylabel("Photons per ms")
+    plt.ylim(0,16000)
     plt.show()
 
 
-    
 
+
+""" This function when called with an arguement return that file if present. Without ant argumrnts, it returns a list containing all .asc file
+"""
 def find_files(keyword="./*.asc"):
     return sorted(glob.glob(keyword))

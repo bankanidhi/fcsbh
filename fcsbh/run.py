@@ -1,4 +1,4 @@
-from .fcsbh_functions import find_files, return_average_count
+from .fcsbh_functions import find_files, return_data,plot_raw_counts
 from .args import get_args
 
 
@@ -13,7 +13,7 @@ def run():
     elif options.m:
         file_list = find_files(options.m)
         for file in file_list:
-            analyse_data_multi(file)
+            plot_raw_counts(file)
 
     # If the user wants to perform a dry run.
     if options.list:
